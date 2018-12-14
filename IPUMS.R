@@ -24,7 +24,7 @@ data <- read_ipums_micro(ddi)
 #Descriptive stats
 descriptive <- subset.data.frame(data, YEAR==1973 & AGE<=100)
 summary(descriptive$AGE)
-descriptive <- subset.data.frame(data, YEAR==2005 & ELDCH<=50)
+descriptive <- subset.data.frame(data, YEAR==2005)
 summary(descriptive$ELDCH)
 descriptive <- subset.data.frame(data, YEAR==2005 & YNGCH<=50)
 summary(descriptive$YNGCH)
@@ -113,9 +113,8 @@ data$YBRN <- data$YEAR-data$AGE
 data$agelstbr <- data$LASTBYR-data$YBRN
 
 
-for(year in c(1973, 1985, 1993, 2008))
+for(year in c(1973, 1985, 1993, 2005))
 {
-  print("===============")
   print(paste("year", year))
   n <- 0
   repeat
@@ -152,26 +151,34 @@ for(year in c(1973, 1985, 1993, 2008))
     chilsurvperwon <- data_surv$num_chilsurv/data_women$num_women #CHSURV
     
     #STOPPING, NA FOR year
-    womenst <- subset.data.frame(data, YEAR==year & SEX==2 & LASTBYR<9998 & AGE<=maxage & AGE>=minage)
+    womenst <- subset.data.frame(data, YEAR==year & SEX==2 & LASTBYR<2100 & AGE<=maxage & AGE>=minage & LASTBYR != 2000)
     data_women <- womenst %>%
     summarise(age_lstb = (mean(agelstbr)))
-    printf <- function(...) cat(sprintf(...))
-    printf(
-        "%d, %d, %d, %d\n",
-        firstyear,
-        maxage,
-        nrow(women),
-        nrow(womenceli)
-    )
-    print(paste(firstyear, "-", lastyear))
-    print(paste(maxage, "-", minage))
-    print(paste("women", nrow(women)))
-    print(paste("womenceli", nrow(womenceli)))
-    print(paste("womenchildren", nrow(womenchildren)))
-    print(paste("ratiocelichildren", round(nrow(womenceli) / nrow(womenchildren)*100), "%"))
-    print(paste("chilperwon", chilperwon))
-    print(paste("chilsruveperwon", chilsurvperwon))
-    print(paste("data_women", data_women$age_lstb))
-    print("===")
+
+    if(1){
+      printf <- function(...) cat(sprintf(...))
+      printf(
+          "%d-%d, %d-%d, %d, %d, %d, %f, %f, %f \n",
+          firstyear, lastyear,
+          maxage, minage,
+          nrow(women),
+          nrow(womenceli),
+          nrow(womenchildren),
+          chilperwon,
+          chilsurvperwon,
+          data_women$age_lstb
+      )
+    } else {
+      print(paste(firstyear, "-", lastyear))
+      print(paste(maxage, "-", minage))
+      print(paste("women", nrow(women)))
+      print(paste("womenceli", nrow(womenceli)))
+      print(paste("womenchildren", nrow(womenchildren)))
+      print(paste("ratiocelichildren", round(nrow(womenceli) / nrow(womenchildren)*100), "%"))
+      print(paste("chilperwon", chilperwon))
+      print(paste("chilsruveperwon", chilsurvperwon))
+      print(paste("data_women", data_women$age_lstb))
+      print("===")
+    }
   }
 }
